@@ -2,7 +2,8 @@
 include ('settings.php');
 include ('CobblerAPIClient.class.php');
 
-$client = new CobblerAPIClient($cobbler_server['host'], $cobbler_server['port'], $cobbler_server['path'], $cobbler_server['user'], $cobbler_server['password']);
+$client = new CobblerAPIClient($cobbler_server['host'], $cobbler_server['port'], $cobbler_server['path'], $cobbler_server['user'], $cobbler_server['password'], false);
+
 $token = $client->auth();
 $name = 'delete';
 $client->deleteSystem($name);
@@ -13,3 +14,12 @@ $client->setSSHKey($name, $key);
 $client->setSSHKey($name, 'aa');
 $client->setPassword($name,'pepito');
 $client->setPassword($name,'flores');
+
+echo '<b>SYSTEMS</b>'.PHP_EOL;
+var_dump($client->listSystems());
+echo '<b>PROFILES</b>'.PHP_EOL;
+var_dump($client->listProfiles());
+echo '<b>IMAGES</b>'.PHP_EOL;
+var_dump($client->listImages());
+echo '<b>DISTROS</b>'.PHP_EOL;
+var_dump($client->listDistros());

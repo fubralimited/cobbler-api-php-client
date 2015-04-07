@@ -46,6 +46,24 @@ class CobblerAPIClient {
 		return $this->ixr_client->getResponse();
 	}
 
+	function listDistros(){
+		$token = $this->auth();	
+		$this->ixr_client->query('get_distros');
+		return $this->ixr_client->getResponse();
+	}
+
+	function listProfiles(){
+		$token = $this->auth();	
+		$this->ixr_client->query('get_profiles');
+		return $this->ixr_client->getResponse();
+	}
+
+	function listImages(){
+		$token = $this->auth();	
+		$this->ixr_client->query('get_images');
+		return $this->ixr_client->getResponse();
+	}
+
 	//TODO: Validate name, host and mac to avoid duplicated systems
 	function createSystem($name, $host, $mac, $profile, $interface_name = 'eth0'){
 		
