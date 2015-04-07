@@ -40,6 +40,16 @@ class CobblerAPIClient {
 
 	}
 
+	function findSystem($key, $value){
+		$this->ixr_client->query('find_system', array($key => $value));
+		return $this->ixr_client->getResponse();
+	}
+
+	function existsSystem($key, $value){
+		$systems = $this->findSystem($key, $value);
+		return sizeof($systems) > 0;
+	}
+
 	function listSystems(){
 		$token = $this->auth();	
 		$this->ixr_client->query('get_systems');
@@ -67,7 +77,19 @@ class CobblerAPIClient {
 	//TODO: Validate name, host and mac to avoid duplicated systems
 	function createSystem($name, $host, $mac, $profile, $interface_name = 'eth0'){
 		
-		$token = $this->auth();		
+		$token = $this->auth();
+
+		if ($this->existsSystem('name',$name)){
+			throw new Exception('There is already a system using that name');
+		}		
+
+		if ($this->existsSystem('hostname',$host)){
+			throw new Exception('There is already a system using that hostname');
+		}	
+
+		if ($this->existsSystem('mac_address',$mac)){
+			throw new Exception('There is already a system using that mac address');
+		}	
 
 		$this->ixr_client->query('new_system',$token);
 		$system_id = $this->ixr_client->getResponse();

@@ -15,7 +15,7 @@ $client->setSSHKey($name, 'aa');
 $client->setPassword($name,'pepito');
 $client->setPassword($name,'flores');
 
-echo '<b>SYSTEMS</b>'.PHP_EOL;
+/*echo '<b>SYSTEMS</b>'.PHP_EOL;
 var_dump($client->listSystems());
 echo '<b>PROFILES</b>'.PHP_EOL;
 var_dump($client->listProfiles());
@@ -23,3 +23,31 @@ echo '<b>IMAGES</b>'.PHP_EOL;
 var_dump($client->listImages());
 echo '<b>DISTROS</b>'.PHP_EOL;
 var_dump($client->listDistros());
+*/
+var_dump($client->findSystem('name','delet'));
+$client->deleteSystem('delete2');
+try {
+	$system_id = $client->createSystem($name,'delete.host.delete','32:00:17:70:bd:a0', 'centos-6.6-x86_64');
+}catch (Exception $e){
+	echo $e->getMessage().PHP_EOL;
+}
+
+try {
+	$system_id = $client->createSystem('delete2','delete.host.delete','32:00:17:70:bd:a0', 'centos-6.6-x86_64');
+}catch (Exception $e){
+	echo $e->getMessage().PHP_EOL;
+}
+
+try {
+	$system_id = $client->createSystem('delete2','delete2.host.delete','32:00:17:70:bd:a0', 'centos-6.6-x86_64');
+}catch (Exception $e){
+	echo $e->getMessage().PHP_EOL;
+}
+
+try {
+	$system_id = $client->createSystem('delete2','delete2.host.delete','33:00:17:70:bd:a0', 'centos-6.6-x86_64');
+}catch (Exception $e){
+	echo $e->getMessage().PHP_EOL;
+}
+
+
