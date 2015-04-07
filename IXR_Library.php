@@ -1233,6 +1233,11 @@ class IXR_ClientSSL extends IXR_Client
                 // Verify against a CA
                 curl_setopt($curl, CURLOPT_CAINFO, $this->_caFile);
             }
+        }else{
+            if ($this->_caFile === false) {
+                // Don't verify their certificate, as we don't have a CA to verify against
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+            }
         }
 
         // Call cURL to do it's stuff and return us the content

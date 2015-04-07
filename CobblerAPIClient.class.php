@@ -8,9 +8,10 @@ class CobblerAPIClient {
 	private $user;
 	private $pass;
 
-	function __construct($host, $port, $path, $user, $pass){
+	function __construct($host, $port, $path, $user, $pass, $debug=false){
 		
-		$this->ixr_client = new IXR_Client($host, $path, $port);
+		$this->ixr_client = new IXR_ClientSSL($host, $path, $port);
+		$this->ixr_client->debug = $debug;
 		$this->user = $user;
 		$this->pass = $pass;
 	} 
@@ -37,6 +38,12 @@ class CobblerAPIClient {
 		$this->ixr_client->query('save_system', $handle, $token);
 		return 1;
 
+	}
+
+	function listSystems(){
+		$token = $this->auth();	
+		$this->ixr_client->query('get_systems');
+		return $this->ixr_client->getResponse();
 	}
 
 	//TODO: Validate name, host and mac to avoid duplicated systems
