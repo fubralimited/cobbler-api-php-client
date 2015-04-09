@@ -1,19 +1,43 @@
 <?php
 
-include ('IXR_Library.php');
+include ('IXRLibrary.php');
 
-class CobblerAPIClient {
+class Cobbler {
 	
-	private $ixr_client;
-	private $user;
-	private $pass;
+	/**
+	 * Client to the xmlrpc Cobbler API, would be the object handling all the requests to the API
+	 */
+	protected $_ixrClient;
+
+	/**
+	 * Cobbler user, needed for authenticated calls to the API
+	 */
+	protected $_user;
+
+	/**
+	 * Cobbler password, needed for authenticated calls to the API
+	 */
+	protected $_pass;
+
+	/**
+	 * Constructor. Gets the cobbler api parameters, builds the ixr client and stores user and 
+	 * password for future auth operations.
+	 *
+	 * @access public
+	 * @param string $host Cobbler hostname or ip address
+	 * @param string $port Cobbler secure/SSL port
+	 * @param string $path Cobbler API path
+	 * @param string $user Cobbler user
+	 * @param string $pass Cobbler password
+	 * @param string $debug (optional) Wether we want to print out stuff from the ixr client or not
+	 */
 
 	function __construct($host, $port, $path, $user, $pass, $debug=false){
 		
-		$this->ixr_client = new IXR_ClientSSL($host, $path, $port);
-		$this->ixr_client->debug = $debug;
-		$this->user = $user;
-		$this->pass = $pass;
+		$this->_ixrClient = new IXR_ClientSSL($host, $path, $port);
+		$this->_ixrClient->debug = $debug;
+		$this->_user = $user;
+		$this->_pass = $pass;
 	} 
 
 	function auth(){

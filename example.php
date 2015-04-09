@@ -1,8 +1,8 @@
 <?php
 include ('settings.php');
-include ('CobblerAPIClient.class.php');
+include ('Cobbler.php');
 
-$client = new CobblerAPIClient($cobbler_server['host'], $cobbler_server['port'], $cobbler_server['path'], $cobbler_server['user'], $cobbler_server['password'], false);
+$client = new Cobbler($cobbler_server['host'], $cobbler_server['port'], $cobbler_server['path'], $cobbler_server['user'], $cobbler_server['password'], false);
 
 $token = $client->auth();
 $name = 'delete';
