@@ -172,9 +172,15 @@ class Cobbler {
 	 * @param $interfaceName Name of the main network interface of the new system, may vary from an SO to another
 	 * @return string The id of the new system
 	 */
-	public function createSystem($name, $host, $mac, $profile, $interfaceName = 'eth0'){
+	public function createSystem($params = array()){
 		
 		$token = $this->auth();
+		
+		$name = $params['name']; 
+		$host = $params['host']; 
+		$mac = $params['mac'];
+		$profile = $params['profile']; 
+		$interfaceName = $params['profile'] == '' ? 'eth0' : $params['profile'];
 
 		if ($this->existsSystem('name',$name)){
 			throw new Exception('There is already a system using that name');
