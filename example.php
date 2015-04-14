@@ -4,8 +4,7 @@ include ('Cobbler.php');
 
 $client = new Cobbler($cobbler_server['host'], $cobbler_server['port'], $cobbler_server['path'], $cobbler_server['user'], $cobbler_server['password'], false);
 
-$token = $client->auth();
-$name = 'delete';
+/*$name = 'delete';
 $client->deleteSystem($name);
 $system_id = $client->createSystem($name,'delete.host.delete','32:00:17:70:bd:a0', 'centos-6.6-x86_64');
 $client->disableNetboot($name);
@@ -24,7 +23,7 @@ var_dump($client->listImages());
 echo '<b>DISTROS</b>'.PHP_EOL;
 var_dump($client->listDistros());
 */
-var_dump($client->findSystem('name','delet'));
+/*var_dump($client->findSystem('name','delet'));
 $client->deleteSystem('delete2');
 try {
 	$system_id = $client->createSystem($name,'delete.host.delete','32:00:17:70:bd:a0', 'centos-6.6-x86_64');
@@ -48,6 +47,7 @@ try {
 	$system_id = $client->createSystem('delete2','delete2.host.delete','33:00:17:70:bd:a0', 'centos-6.6-x86_64');
 }catch (Exception $e){
 	echo $e->getMessage().PHP_EOL;
-}
+}*/
+var_dump( $client->getStatus('87.124.28.71'));
 
 
