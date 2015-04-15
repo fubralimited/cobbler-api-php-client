@@ -179,6 +179,10 @@ class Cobbler {
 		$name = $params['name'];
 		$host = $params['host'];
 		$mac = $params['mac'];
+		//$ip = $params['ip'];
+		//$gateway = $params['gateway'];
+		//$dnsname1 = $params['dnsname1'];
+		//$dnsname2 = $params['dnsname2'];
 		$profile = $params['profile'];
 		$interfaceName = $params['profile'] == '' ? 'eth0' : $params['profile'];
 
