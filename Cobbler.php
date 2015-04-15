@@ -316,6 +316,6 @@ class Cobbler {
 		if (sizeof($status[$ip])){
 			return end ($status[$ip]);
 		}
-		return 'ready';
+		return 'unknown';
 	}
 }
