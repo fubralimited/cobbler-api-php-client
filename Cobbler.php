@@ -193,7 +193,7 @@ class Cobbler {
 		}
 
 		$name = $params['name'];
-		$item = $params['item'];
+		$host = $params['host'];
 		$mac = $params['mac'];
 		$profile = $params['profile'];
 
