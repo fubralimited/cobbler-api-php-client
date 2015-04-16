@@ -146,6 +146,11 @@ class Cobbler {
 	public function listProfiles(){
 		$token = $this->auth();
 		$this->_ixrClient->query('get_profiles');
+
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+
 		return $this->_ixrClient->getResponse();
 	}
 
