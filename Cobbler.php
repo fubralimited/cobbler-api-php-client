@@ -345,7 +345,7 @@ class Cobbler {
 		$token = $this->auth();
 		$this->_ixrClient->query('get_status' ,'normal', $token);
 		$status = $this->_ixrClient->getResponse();
-		if (sizeof($status[$ip])){
+		if (array_key_exists($ip, $status)){
 			return end ($status[$ip]);
 		}
 		return 'unknown';
