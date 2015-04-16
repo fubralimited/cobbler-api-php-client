@@ -176,15 +176,38 @@ class Cobbler {
 
 		$token = $this->auth();
 
+		if (empty($params['name'])) {
+			throw new \Exception('Missing argument: `name` is required.');
+		}
+
+		if (empty($params['host'])) {
+			throw new \Exception('Missing argument: `host` is required.');
+		}
+
+		if (empty($params['mac'])) {
+			throw new \Exception('Missing argument: `mac` is required.');
+		}
+
+		if (empty($params['profile'])) {
+			throw new \Exception('Missing argument: `profile` is required.');
+		}
+
 		$name = $params['name'];
-		$host = $params['host'];
+		$item = $params['item'];
 		$mac = $params['mac'];
+		$profile = $params['profile'];
+
+		if (empty($params['interface'])) {
+			$interfaceName = 'eth0';
+		}else{
+			$interfaceName = $params['interface'];
+		}
+
 		//$ip = $params['ip'];
 		//$gateway = $params['gateway'];
 		//$dnsname1 = $params['dnsname1'];
 		//$dnsname2 = $params['dnsname2'];
-		$profile = $params['profile'];
-		$interfaceName = $params['profile'] == '' ? 'eth0' : $params['profile'];
+
 
 		if ($this->existsSystem('name',$name)){
 			throw new Exception('There is already a system using that name');
