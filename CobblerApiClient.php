@@ -1,8 +1,37 @@
 <?php
 
+#
+#  CobblerApiClient.php
+#
+#  Created by Jorge Serrano on 28-04-2015.
+#  Copyright 2015, Fubra Limited. All rights reserved.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  You may obtain a copy of the License at:
+#  http://www.gnu.org/licenses/gpl-2.0.txt
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+/*****************************
+ *
+ * Cobbler PHP API client.
+ * PHP Client for accesing the Cobbler XMLRPC API, based on the 
+ * Incatuio XMLRPC client library
+ * Check https://fedorahosted.org/cobbler/wiki/CobblerXmlrpc 
+ * Check also http://scripts.incutio.com/xmlrpc/
+ * 
+ ******************************/
+
 include ('IXRLibrary.php');
 
-class Cobbler {
+class CobblerApiClient {
 
 	/**
 	 * Client to the xmlrpc Cobbler API, would be the object handling all the requests to the API
@@ -32,7 +61,16 @@ class Cobbler {
 	 * @param string $debug (optional) Wether we want to print out stuff from the ixr client or not
 	 */
 	public function __construct($host, $port, $path, $user, $pass, $debug=false){
-
+		//Check if the Cobbler server is available
+		$address = gethostbyname($host);
+		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		$result = socket_connect($socket, $address, $port);
+		
+		if ($result === false) {
+			throw new \Exception('The Cobbler server is not available, check if the parameters are correct'); 
+		}
+		
+		//Create the secure IXR client and store user/pass for auth operations
 		$this->_ixrClient = new IXR_ClientSSL($host, $path, $port);
 		$this->_ixrClient->debug = $debug;
 		$this->_user = $user;
@@ -47,7 +85,11 @@ class Cobbler {
 	 */
 	protected function auth(){
 		$this->_ixrClient->query('login',$this->_user,$this->_pass);
-		return $this->_ixrClient->getResponse();
+		$response = $this->_ixrClient->getResponse();
+		if (is_array($response)) { 
+			throw new Exception('The credentials provided to the client are not right');
+		}
+		return $response;
 	}
 
 	/**
@@ -170,17 +212,14 @@ class Cobbler {
 	 * Create a new system in Cobbler
 	 *
 	 * @access public
-	 * @param $name Name of the new system, must be unique as it will act as identifier
-	 * @param $host Hostname of the new system, must be unique
-	 * @param $mac Mac address of the new system, must be unique
-	 * @param $profile Profile (OS + kickstart template) of the new system
-	 * @param $interfaceName Name of the main network interface of the new system, may vary from an SO to another
+	 * @param $params Array of parameters of the systems, name, host, mac and profile are compulsory
 	 * @return string The id of the new system
 	 */
 	public function createSystem($params = array()){
 
 		$token = $this->auth();
-
+		
+		//Check the compulsory fields
 		if (empty($params['name'])) {
 			throw new \Exception('Missing argument: `name` is required.');
 		}
@@ -207,13 +246,12 @@ class Cobbler {
 		}else{
 			$interfaceName = $params['interface'];
 		}
+		
+		$ip = isset($params['ip']) ? $params['ip'] : '';
+		$gateway = isset($params['gateway']) ? $params['gateway'] : '';
+		$dnsnames = isset($params['dnsnames']) ? $params['dnsnames'] : '';
 
-		//$ip = $params['ip'];
-		//$gateway = $params['gateway'];
-		//$dnsname1 = $params['dnsname1'];
-		//$dnsname2 = $params['dnsname2'];
-
-
+		//Check the unique fields
 		if ($this->existsSystem('name',$name)){
 			throw new Exception('There is already a system using that name');
 		}
@@ -234,20 +272,15 @@ class Cobbler {
 
 		$interface = array();
 		$interface['macaddress-'.$interfaceName] = $mac;
-		//$interface['ipaddress-'.$interfaceName] = $ip;
-		//$interface['gateway-'.$interfaceName] = $mac;
-		//$interface['virtbridge-'.$interfaceName] = 'xenbr0';
-		//$interface['dnsname-'.$interfaceName] = $mac;
-		//$interface['static-'.$interfaceName] = True;
-		//$interface['dhcptag-'.$interfaceName] = $mac;
-		//$interface['staticroutes-'.$interfaceName] = $mac;
+		
+		$interface['ipaddress-'.$interfaceName] = $ip;
+		$interface['gateway-'.$interfaceName] = $gateway;
+		$interface['dnsname-'.$interfaceName] = $dnsnames;
+
 		$this->_ixrClient->query('modify_system', $system_id, 'modify_interface', $interface, $token);
-
-
 		$this->_ixrClient->query('save_system', $system_id, $token);
 
 		return $system_id;
-
 	}
 
 	/**
@@ -305,13 +338,13 @@ class Cobbler {
 	 *
 	 * @access public
 	 * @param string $system_name Name of the system
-	 * @param string $key SSH key to add to the system.
+	 * @param string $key SSH key to add to the system, without comments or spaces.
 	 * @return boolean True if everything goes fine, false otherwise
 	 */
 	public function setSSHKey($system_name, $key) {
 
 		$token = $this->auth();
-		$this->updateMetadata($token, $system_name, 'ssh_key', $key);
+		$this->updateMetadata($token, $system_name, 'ssh_key', trim($key));
 		return true;
 
 	}
