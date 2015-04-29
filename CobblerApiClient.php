@@ -118,13 +118,24 @@ class CobblerApiClient {
 	protected function updateMetadata($token, $system_name, $key, $value){
 
 		$this->_ixrClient->query('get_system', $system_name);
+		
 		$system = $this->_ixrClient->getResponse();
+		
+		if (!is_array($system)) {
+			throw new Exception('System not found');
+		}
+		
 		$metadata = $system['ks_meta'];
 		$metadata[$key] = $value;
 		$metadata_string = implode(' ', array_map(function ($v, $k) { return $k . '=' . $v; }, $metadata, array_keys($metadata)));
 		$handle = $this->getSystemHandle($token, $system_name);
 		$this->_ixrClient->query('modify_system', $handle,'ks_meta', $metadata_string, $token);
 		$this->_ixrClient->query('save_system', $handle, $token);
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return true;
 
 	}
@@ -164,6 +175,11 @@ class CobblerApiClient {
 	public function listSystems(){
 		$token = $this->auth();
 		$this->_ixrClient->query('get_systems');
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return $this->_ixrClient->getResponse();
 	}
 
@@ -176,6 +192,11 @@ class CobblerApiClient {
 	public function listDistros(){
 		$token = $this->auth();
 		$this->_ixrClient->query('get_distros');
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return $this->_ixrClient->getResponse();
 	}
 
@@ -205,6 +226,11 @@ class CobblerApiClient {
 	public function listImages(){
 		$token = $this->auth();
 		$this->_ixrClient->query('get_images');
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return $this->_ixrClient->getResponse();
 	}
 
@@ -279,6 +305,11 @@ class CobblerApiClient {
 
 		$this->_ixrClient->query('modify_system', $system_id, 'modify_interface', $interface, $token);
 		$this->_ixrClient->query('save_system', $system_id, $token);
+		
+		if ($this->_ixrClient->isError()) {
+			$this->deleteSystem($name);
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
 
 		return $system_id;
 	}
@@ -294,6 +325,11 @@ class CobblerApiClient {
 
 		$token = $this->auth();
 		$this->_ixrClient->query('remove_system', $system_name, $token);
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return true;
 
 	}
@@ -311,6 +347,11 @@ class CobblerApiClient {
 		$handle = $this->getSystemHandle($token, $system_name);
 		$this->_ixrClient->query('modify_system', $handle,'netboot_enabled', True, $token);
 		$this->_ixrClient->query('save_system', $handle, $token);
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return true;
 
 	}
@@ -328,6 +369,11 @@ class CobblerApiClient {
 		$handle = $this->getSystemHandle($token, $system_name);
 		$this->_ixrClient->query('modify_system', $handle,'netboot_enabled', False, $token);
 		$this->_ixrClient->query('save_system', $handle, $token);
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		return true;
 
 	}
@@ -344,7 +390,7 @@ class CobblerApiClient {
 	public function setSSHKey($system_name, $key) {
 
 		$token = $this->auth();
-		$this->updateMetadata($token, $system_name, 'ssh_key', trim($key));
+		$this->updateMetadata($token, $system_name, 'ssh_key', trim($key));		
 		return true;
 
 	}
@@ -378,9 +424,16 @@ class CobblerApiClient {
 		$token = $this->auth();
 		$this->_ixrClient->query('get_status' ,'normal', $token);
 		$status = $this->_ixrClient->getResponse();
+		
+		if ($this->_ixrClient->isError()) {
+			throw new Exception($this->_ixrClient->getErrorMessage());
+		}
+		
 		if (array_key_exists($ip, $status)){
 			return end ($status[$ip]);
+		}else{
+			return 'unknown';
 		}
-		return 'unknown';
+		
 	}
 }
